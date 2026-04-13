@@ -29,7 +29,7 @@ export default function OuvidoriaPage() {
   const nextStep = () => setStep((prev) => (prev < totalSteps + 1 ? prev + 1 : prev));
   const prevStep = () => setStep((prev) => (prev > 1 ? prev - 1 : prev));
 
-  const [isSubmitting, setIsSubmitting] = useState(false); // Adicione esse estado lá junto com os outros
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -41,9 +41,10 @@ export default function OuvidoriaPage() {
       });
 
       if (response.ok) {
-        nextStep(); // Vai para a tela de sucesso
+        // Forçamos o passo para garantir que a tela de sucesso apareça
+        setStep(totalSteps + 2); 
       } else {
-        alert("Ocorreu um erro ao enviar. Tente novamente.");
+        alert("Ocorreu um erro ao enviar para o e-mail da ouvidoria. Verifique as configurações.");
       }
     } catch (error) {
       alert("Erro de conexão. Verifique sua internet.");
@@ -129,7 +130,6 @@ export default function OuvidoriaPage() {
           </div>
         );
       case 7:
-        // AJUSTE SOLICITADO AQUI: Novos setores
         const setoresHorizonte = [
             "Venda de Terrenos",
             "Atendimento",
@@ -233,7 +233,7 @@ export default function OuvidoriaPage() {
     }
   };
 
-  // Tela final de Sucesso (Passo 13 interno)
+  // Tela final de Sucesso (Cai aqui quando setamos totalSteps + 2)
   if (step > totalSteps + 1) {
     return (
       <div className="min-h-screen bg-horizonte-azul flex items-center justify-center p-4">
@@ -246,40 +246,31 @@ export default function OuvidoriaPage() {
     );
   }
 
-  // Progresso do form
-  const progressPercentage = (step / (totalSteps + 1)) * 100;
-
   return (
     <div className="min-h-screen bg-horizonte-azul flex flex-col items-center py-12 px-4">
-      
-      {/* HEADER AJUSTADO AQUI: Logo em vez de texto */}
       <div className="w-full max-w-3xl mb-10 flex justify-center">
         <Image 
-          src="/logo-horizonte.png" // O arquivo precisa estar na pasta /public
+          src="/logo-horizonte.png"
           alt="Logo Horizonte Park"
-          width={280} // Ajuste o tamanho conforme necessário
-          height={90} // Ajuste o tamanho conforme necessário
-          priority // Carrega a imagem com prioridade (LCP)
-          className="h-20 w-auto" // Mantém a proporção e define altura via Tailwind
+          width={280}
+          height={90}
+          priority
+          className="h-20 w-auto"
         />
       </div>
 
-      {/* Card Principal */}
       <div className="bg-horizonte-branco w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden flex flex-col min-h-[550px] border border-gray-100">
-        
-        {/* Conteúdo dinâmico */}
         <div className="flex-grow p-8 md:p-12 flex items-center justify-center">
           <div className="w-full max-w-xl">
             {renderStepContent()}
           </div>
         </div>
 
-        {/* Rodapé / Botões de Navegação */}
         <div className="flex border-t border-gray-100 bg-gray-50">
           <button 
             onClick={prevStep} 
-            disabled={step === 1}
-            className={`flex-1 flex items-center justify-center gap-2 p-6 font-bold transition-colors ${step === 1 ? "text-gray-300 bg-gray-50 cursor-not-allowed" : "text-gray-600 hover:bg-gray-100"}`}
+            disabled={step === 1 || isSubmitting}
+            className={`flex-1 flex items-center justify-center gap-2 p-6 font-bold transition-colors ${step === 1 || isSubmitting ? "text-gray-300 bg-gray-50 cursor-not-allowed" : "text-gray-600 hover:bg-gray-100"}`}
           >
             <ArrowLeft size={20} /> ANTERIOR
           </button>
@@ -305,7 +296,6 @@ export default function OuvidoriaPage() {
         </div>
       </div>
 
-      {/* Barra de Progresso Estilizada */}
       <div className="w-full max-w-3xl mt-10 flex flex-col items-center gap-3">
         <div className="flex gap-2.5 mb-2 flex-wrap justify-center">
           {Array.from({ length: totalSteps + 1 }).map((_, index) => (
@@ -315,7 +305,7 @@ export default function OuvidoriaPage() {
             />
           ))}
         </div>
-        <p className="text-horizonte-branco/70 text-sm font-medium tracking-wide">Passo {step} de {totalSteps + 1}</p>
+        <p className="text-horizonte-branco/70 text-sm font-medium tracking-wide">Passo {step > totalSteps + 1 ? totalSteps + 1 : step} de {totalSteps + 1}</p>
       </div>
     </div>
   );
