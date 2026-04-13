@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@theme {
+  --color-horizonte-verde: #48e368;
+  --color-horizonte-azul: #0083df;
+  --color-horizonte-branco: #fefefe;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
