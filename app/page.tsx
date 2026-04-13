@@ -29,10 +29,27 @@ export default function OuvidoriaPage() {
   const nextStep = () => setStep((prev) => (prev < totalSteps + 1 ? prev + 1 : prev));
   const prevStep = () => setStep((prev) => (prev > 1 ? prev - 1 : prev));
 
-  const handleSubmit = () => {
-    // Aqui você vai plugar o seu banco (ex: Supabase)
-    console.log("Dados enviados:", formData);
-    nextStep(); // Vai para a tela de sucesso (Passo 12)
+  const [isSubmitting, setIsSubmitting] = useState(false); // Adicione esse estado lá junto com os outros
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      const response = await fetch("/api/enviar-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        nextStep(); // Vai para a tela de sucesso
+      } else {
+        alert("Ocorreu um erro ao enviar. Tente novamente.");
+      }
+    } catch (error) {
+      alert("Erro de conexão. Verifique sua internet.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Renderiza o conteúdo do card baseado no passo atual
@@ -270,9 +287,12 @@ export default function OuvidoriaPage() {
           {step === totalSteps + 1 ? (
              <button 
              onClick={handleSubmit} 
-             className="flex-1 flex items-center justify-center gap-2 p-6 font-bold bg-horizonte-verde text-horizonte-branco hover:bg-green-500 transition-colors shadow-inner"
+             disabled={isSubmitting}
+             className={`flex-1 flex items-center justify-center gap-2 p-6 font-bold text-horizonte-branco transition-colors shadow-inner ${
+               isSubmitting ? "bg-green-600 opacity-70 cursor-not-allowed" : "bg-horizonte-verde hover:bg-green-500"
+             }`}
            >
-             ENVIAR FORMULÁRIO <CheckCircle size={20} />
+             {isSubmitting ? "ENVIANDO..." : "ENVIAR FORMULÁRIO"} <CheckCircle size={20} />
            </button>
           ) : (
             <button 
